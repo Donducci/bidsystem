@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String?
+  password String
+
+  collections  Collection[]
+  bids    Bid[]
+
+}
+
+model Collection {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  stocks      Int
+  price       Float
+  userId      Int
+
+  user        User    @relation(fields: [userId], references: [id])
+  bids        Bid[]
+}
+
+model Bid {
+  id            Int     @id @default(autoincrement())
+  userId        Int
+  collectionId  Int
+  stocks         Int
+  price         Float
+  status        BidStatus
+
+  user          User        @relation(fields: [userId], references: [id])
+  collection   Collection   @relation(fields: [collectionId ], references: [id])
+}
+
+enum BidStatus {
+  pending
+  accepted
+  rejected
+}
